@@ -2,7 +2,6 @@ import Module from "./module.js"
 
 export default class ClimateModule extends Module {
 
-    // Climate module groups into zones all the functions related to climate control
     zones = []
 
     constructor(config, dovit, mqtt) {
@@ -33,7 +32,7 @@ export default class ClimateModule extends Module {
                 console.log(message)
         }
 
-        this.mqtt.publish(`${this.config.mqtt.topic}/${func.functionId}${device.zone.id}`, JSON.stringify(this.zones[device.zone.id]))
+        this.mqtt.publish(`${this.config.mqtt.topic}/${func.functionId}-${device.zone.id}`, JSON.stringify(this.zones[device.zone.id]))
     }
 
 }

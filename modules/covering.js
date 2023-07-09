@@ -1,8 +1,7 @@
 import Module from "./module.js"
 
 export default class CoveringModule extends Module {
-
-    // Climate module groups into zones all the functions related to climate control
+    
     shutters = []
 
     constructor(config, dovit, mqtt) {
