@@ -1,0 +1,11 @@
+{
+    "dovit": {
+        "ip": "172.16.137.1",
+        "dpPort": "6060",
+        "uiPort": "90"
+    },
+    "mqtt": {
+        "url": "mqtt://10.10.0.17",
+        "topic": "dovit2mqtt"
+    }
+}
