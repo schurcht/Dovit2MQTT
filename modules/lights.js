@@ -22,7 +22,7 @@ export default class LightsModule extends Module {
                 console.log(message)
         }
 
-        this.mqtt.publish(`${this.config.mqtt.topic}/${func.functionId}-${device.id}`, JSON.stringify(this.lights[device.id]))
+        this.mqtt.publish(`${this.config.mqtt.topic}/${device.name}`, JSON.stringify(this.lights[device.id]))
     }
 
 }
