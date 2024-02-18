@@ -16,7 +16,10 @@ export default class Bridge {
     start() {
         return new Promise((resolve) => {
             this.dovit = new Dovit(this.config.dovit.ip, this.config.dovit.dpPort, this.config.dovit.uiPort)
-            this.mqtt = mqttClient.connect(this.config.mqtt.url)
+            this.mqtt = mqttClient.connect(this.config.mqtt.url, {
+                username: this.config.mqtt.username,
+                password: this.config.mqtt.password
+            })
 
             this.loadedModules = [
                 new ClimateModule(this.config, this.dovit, this.mqtt),
