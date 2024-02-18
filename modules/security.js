@@ -30,7 +30,7 @@ export default class SecurityModule extends Module {
                 console.log(message)
         }
 
-        this.mqtt.publish(`${this.config.mqtt.topic}/${func.functionId}-${device.zone.id}`, JSON.stringify(this.zones[device.zone.id]))
+        this.mqtt.publish(`${this.config.mqtt.topic}/${device.name}`, JSON.stringify(this.zones[device.zone.id]))
     }
 
 }
