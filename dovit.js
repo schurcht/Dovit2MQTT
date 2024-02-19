@@ -21,7 +21,6 @@ export default class Dovit extends EventEmitter {
         const client = this;
         return new Promise(async (resolve) => {
             client.dp = new net.Socket();
-            await Promise.all([client.loadZones(), this.loadFunctions()])
             await client.loadDevices();
             client.dp.connect(this.dpPort, this.ip, () => {
                 this.dp.write(Buffer.from('<hisynch-ask></hisynch-ask>\u0000'))
@@ -44,6 +43,9 @@ export default class Dovit extends EventEmitter {
     }
 
     async loadDevices() {
+        await Promise.all([this.loadZones(), this.loadFunctions()])
+
+        console.log("loading devices...")
         const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/hidv-config-list.s`)
 
         const devices = new XMLParser({
@@ -83,10 +85,11 @@ export default class Dovit extends EventEmitter {
             }
         })
 
-        this.devices = this.devices.filter(e => !(e.zone.name == "Overview" && e.description == "Zone RISCO"))
+        return this.devices = this.devices.filter(e => !(e.zone.name == "Overview" && e.description == "Zone RISCO"))
     }
 
     async loadFunctions() {
+        console.log("loading functions...")
         const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/hifunction-map.c`)
 
         const functions = new XMLParser({
@@ -116,9 +119,13 @@ export default class Dovit extends EventEmitter {
                 })
             }
         })
+
+        if (this.functions == undefined)
+            console.error("No functions loaded")
     }
 
     async loadZones() {
+        console.log("loading zones...")
         const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/higeo-map.c`)
 
         const zones = new XMLParser({
@@ -174,5 +181,24 @@ export default class Dovit extends EventEmitter {
         } else {
             console.warn("Received unsupported message type: " + type)
         }
+    }
+
+    sendCommand(id, type, value) {
+        this.dp.write(this.getCommandAsBuffer(id, type, value))
+    }
+
+    getCommandAsBuffer(id, type, value) {
+        return Buffer.from(`
+        <hidv-state>
+            <device id="${id}">
+                <statetype>${type}</statetype>
+                <statevalue>${value}</statevalue>
+                <timefleeting>-32768</timefleeting>
+                <endvalue>${value}</endvalue>
+                <speed>-32768</speed>
+            </device>
+        </hidv-state>
+        \u0000
+    `.replace(/[\s]+(?![^><]*>)/g, ""))
     }
 }
