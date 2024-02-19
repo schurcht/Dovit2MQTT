@@ -27,6 +27,22 @@ export default class Dovit extends EventEmitter {
                 client.dp.on('data', (data) => client.__handleData(client, data));
                 resolve();
             });
+
+            client.dp.on('error', (err) => {
+                console.error("Error connecting to Dovit", err)
+                console.log("Retrying in 5 seconds...")
+                setTimeout(this.connect, 5000)
+            });
+            client.dp.on('close', () => {
+                console.log("Connection to Dovit closed")
+                console.log("Retrying in 5 seconds...")
+                setTimeout(this.connect, 5000)
+            })
+            client.dp.on('end', () => {
+                console.log("Connection to Dovit ended")
+                console.log("Retrying in 5 seconds...")
+                setTimeout(this.connect, 5000)
+            })
         })
     }
 
