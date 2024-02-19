@@ -8,7 +8,6 @@ export default class ClimateModule extends Module {
     constructor(config, dovit, mqtt) {
         dovit.loadDevices().then(devices => {
             var sensors = devices.filter(e => e.functions.find(f => f.subfunction == "temperature"))
-            console.log(sensors)
 
             for (var sensor of sensors) {
                 this.temperature_sensors[sensor.id] = { id: sensor.id, name: `${sensor.zone.name} ${sensor.name}` }

@@ -24,8 +24,8 @@ export default class Bridge {
             this.loadedModules = [
                 new ClimateModule(this.config, this.dovit, this.mqtt),
                 new SecurityModule(this.config, this.dovit, this.mqtt),
-                new LightsModule(this.config, this.dovit, this.mqtt)
-                //new CoveringModule(this.config, this.dovit, this.mqtt)
+                new LightsModule(this.config, this.dovit, this.mqtt),
+                new CoveringModule(this.config, this.dovit, this.mqtt)
             ]
 
             var mqttConn = new Promise((resolve) => {

@@ -51,7 +51,7 @@ export default class LightsModule extends Module {
             const id = topic.split("/")[1]
             const action = topic.split("/")[2]
 
-            if (action == "set") {
+            if (action == "set" && this.lights[id] != undefined) {
                 this.dovit.sendCommand(id, 0, message == "ON" ? 1 : 0)
             }
             console.log("Received message", topic, message.toString())

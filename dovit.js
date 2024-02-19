@@ -183,18 +183,18 @@ export default class Dovit extends EventEmitter {
         }
     }
 
-    sendCommand(id, type, value) {
-        this.dp.write(this.getCommandAsBuffer(id, type, value))
+    sendCommand(id, type, value, endValue) {
+        this.dp.write(this.getCommandAsBuffer(id, type, value, endValue ?? value))
     }
 
-    getCommandAsBuffer(id, type, value) {
+    getCommandAsBuffer(id, type, value, endvalue) {
         return Buffer.from(`
         <hidv-state>
             <device id="${id}">
                 <statetype>${type}</statetype>
                 <statevalue>${value}</statevalue>
                 <timefleeting>-32768</timefleeting>
-                <endvalue>${value}</endvalue>
+                <endvalue>${endvalue}</endvalue>
                 <speed>-32768</speed>
             </device>
         </hidv-state>
