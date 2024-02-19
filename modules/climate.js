@@ -82,13 +82,10 @@ export default class ClimateModule extends Module {
             const param = topic.split("/")[2]
             const action = topic.split("/")[3]
 
-            console.log(topic.split("/"))
-
             if (param == "temperature_desired" && action == "set" && this.zone_desired_temperature[zoneid] != undefined) {
                 var id = this.zone_desired_temperature[zoneid].id
                 this.dovit.sendCommand(id, 0, message)
             }
-            console.log("Received message", topic, message.toString())
          })
     }
 

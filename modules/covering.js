@@ -81,14 +81,16 @@ export default class CoveringModule extends Module {
 
             if (action == "set" && this.shutters[id] != undefined) {
                 if (message == "OPEN") {
+                    console.log("Opening shutter " + id)
                     this.openShutter(id)
                 } else if (message == "CLOSE") {
+                    console.log("Closing shutter " + id)
                     this.closeShutter(id)
                 } else if (message == "STOP") {
+                    console.log("Stopping shutter " + id)
                     this.stopShutter(id)
                 }
             }
-            console.log("Received message", topic, message.toString())
         })
     }
 

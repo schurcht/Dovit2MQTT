@@ -52,9 +52,11 @@ export default class LightsModule extends Module {
             const action = topic.split("/")[2]
 
             if (action == "set" && this.lights[id] != undefined) {
+                console.log("Sending command to dovit for light #", id, "to set",  message.toString())
                 this.dovit.sendCommand(id, 0, message == "ON" ? 1 : 0)
+            } else {
+                console.log("Unknown action '", action, "' or unknown light #", id)
             }
-            console.log("Received message", topic, message.toString())
          })
     }
 
