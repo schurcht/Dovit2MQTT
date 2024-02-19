@@ -64,11 +64,6 @@ export default class Dovit extends EventEmitter {
 
             let subfunctions = (Array.isArray(functions) ? functions : [functions]).map(e => [{ function: e["@_id"], subfunction: e["funcsubzone"]["@_id"] }])
 
-            if (this.functions == undefined || this.functions.length == 0){
-                console.warn(`Found device "${device['dvlabel']}" with function , skipping...`)
-                return undefined
-            }
-
             return {
                 id: device['@_id'],
                 name: device['dvlabel'],
@@ -80,13 +75,19 @@ export default class Dovit extends EventEmitter {
                 },
                 functions: subfunctions.flat().map(e => {
                     const func = this.functions.find(f => f.id == e.function)
+
+                    if (func == undefined){
+                        console.warn(`Found device "${device['dvlabel']}" with function , skipping...`)
+                        return undefined
+                    }
+
                     return {
                         function: func.name,
                         functionId: func.id,
                         subfunction: func.subfunctions.find(subfunction => subfunction.id == e.subfunction).name,
                         subfunctionId: e.subfunction
                     }
-                }),
+                }).filter(e => e != undefined),
             }
         }).filter(e => e != undefined)
 
