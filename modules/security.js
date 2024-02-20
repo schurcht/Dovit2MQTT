@@ -26,6 +26,7 @@ export default class SecurityModule extends Module {
         switch (func.subfunction) {
             case "presence sensor" || "sensor state":
                 this.zones[device.zone.id]["occupancy"] = message.statevalue == 1 ? true : false
+                console.log("Trigger motion on " + device.name)
                 this.mqtt.publish(`${this.config.mqtt.topic}/${device.id}/state`, message.statevalue == 1 ? "ON" : "OFF")
                 break;
             case "partition alarm":

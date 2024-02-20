@@ -169,20 +169,19 @@ export default class Dovit extends EventEmitter {
 
     async loadZones() {
         console.log("loading zones...")
-        this.zones = []
-        // const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/higeo-map.c`)
+        const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/higeo-map.c`)
 
-        // const zones = new XMLParser({
-        //     ignoreAttributes: false,
-        //     attributeNamePrefix: "@_"
-        // }).parse(res.data)["higeo-map"]["geozone"]
+        const zones = new XMLParser({
+            ignoreAttributes: false,
+            attributeNamePrefix: "@_"
+        }).parse(res.data)["higeo-map"]["geozone"]
 
-        // this.zones = zones.map(device => {
-        //     return {
-        //         id: device['@_id'],
-        //         name: device['label'],
-        //     }
-        // })
+        this.zones = zones.map(device => {
+            return {
+                id: device['@_id'],
+                name: device['label'],
+            }
+        })
     }
 
     __handleData(client, data) {
