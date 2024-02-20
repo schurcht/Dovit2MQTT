@@ -59,7 +59,6 @@ export default class CoveringModule extends Module {
 
     async publishDevices() {
         this.shutters.forEach(shutter => {
-            console.log(shutter)
             this.mqtt.publish(`homeassistant/cover/${this.config.mqtt.topic}_${shutter.id}/config`, JSON.stringify({
                 unique_id: "dovit2mqtt_" + shutter.id,
                 name: shutter.name,

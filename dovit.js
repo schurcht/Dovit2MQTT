@@ -3,6 +3,8 @@ import { EventEmitter } from "events";
 import { XMLParser } from "fast-xml-parser";
 import axios from "axios";
 
+const PING_INTERVAL = 1000 * 60
+
 export default class Dovit extends EventEmitter {
 
     dp = new net.Socket();
@@ -23,27 +25,31 @@ export default class Dovit extends EventEmitter {
             client.dp = new net.Socket();
             await client.loadDevices();
             client.dp.connect(this.dpPort, this.ip, () => {
-                this.dp.write(Buffer.from('<hisynch-ask></hisynch-ask>\u0000'))
                 client.dp.on('data', (data) => client.__handleData(client, data));
+
+                this.ping();
+                setInterval(this.ping, PING_INTERVAL)
                 resolve();
             });
 
             client.dp.on('error', (err) => {
                 console.error("Error connecting to Dovit", err)
-                console.log("Retrying in 5 seconds...")
-                setTimeout(this.connect.bind(this), 5000)
+                process.exit(1)
             });
             client.dp.on('close', () => {
                 console.log("Connection to Dovit closed")
-                console.log("Retrying in 5 seconds...")
-                setTimeout(this.connect.bind(this), 5000)
+                process.exit(1)
             })
             client.dp.on('end', () => {
                 console.log("Connection to Dovit ended")
-                console.log("Retrying in 5 seconds...")
-                setTimeout(this.connect.bind(this), 5000)
+                process.exit(0)
             })
         })
+    }
+
+    ping(){ 
+        console.log("Sending ping")
+        this.dp.write(Buffer.from('<hisynch-ask></hisynch-ask>\u0000'))
     }
 
     async getAllDevices() {
