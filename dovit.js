@@ -47,7 +47,7 @@ export default class Dovit extends EventEmitter {
         })
     }
 
-    ping(){ 
+    ping() {
         console.log("Sending ping")
         this.dp.write(Buffer.from('<hisynch-ask></hisynch-ask>\u0000'))
     }
@@ -65,55 +65,70 @@ export default class Dovit extends EventEmitter {
     }
 
     async loadDevices() {
-        await Promise.all([this.loadZones(), this.loadFunctions()])
+        if (this.devicesLoaded)
+            return this.devices
 
-        console.log("loading devices...")
-        const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/hidv-config-list.s`)
+        if (this.loadDevicePromise != undefined){
+            console.log("Devices is already loading, waiting")
+            return await this.loadDevicePromise
+        }
 
-        const devices = new XMLParser({
-            ignoreAttributes: false,
-            attributeNamePrefix: "@_"
-        }).parse(res.data)['hidv-config-list']['device']
+        return this.loadDevicePromise = new Promise(async (resolve, reject) => {
+            await Promise.all([this.loadZones(), this.loadFunctions()])
 
-        this.devices = devices.map(device => {
-            let zone = undefined
-            if (device['geozone'] != undefined)
-                zone = device['geozone']['@_id']
+            console.log("loading devices...")
+            const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/hidv-config-list.s`)
 
-            let functions = []
-            if (device['functzones'] != undefined)
-                functions = device["functzones"]["function"]
+            const devices = new XMLParser({
+                ignoreAttributes: false,
+                attributeNamePrefix: "@_"
+            }).parse(res.data)['hidv-config-list']['device']
 
-            let subfunctions = (Array.isArray(functions) ? functions : [functions]).map(e => [{ function: e["@_id"], subfunction: e["funcsubzone"]["@_id"] }])
+            this.devices = devices.map(device => {
+                let zone = undefined
+                if (device['geozone'] != undefined)
+                    zone = device['geozone']['@_id']
 
-            return {
-                id: device['@_id'],
-                name: device['dvlabel'],
-                description: device['description'],
-                type: device['type'],
-                zone: {
-                    id: zone,
-                    name: (this.zones.find(e => e.id == zone) ?? { name: "" }).name
-                },
-                functions: subfunctions.flat().map(e => {
-                    const func = this.functions.find(f => f.id == e.function)
+                let functions = []
+                if (device['functzones'] != undefined)
+                    functions = device["functzones"]["function"]
 
-                    if (func == undefined){
-                        //console.warn(`Found device "${device['dvlabel']}" without function , skipping...`)
-                        return undefined
-                    }
+                let subfunctions = (Array.isArray(functions) ? functions : [functions]).map(e => [{ function: e["@_id"], subfunction: e["funcsubzone"]["@_id"] }])
 
-                    return {
-                        function: func.name,
-                        functionId: func.id,
-                        subfunction: func.subfunctions.find(subfunction => subfunction.id == e.subfunction).name,
-                        subfunctionId: e.subfunction
-                    }
-                }).filter(e => e != undefined),
-            }
-        }).filter(e => e != undefined)
+                return {
+                    id: device['@_id'],
+                    name: device['dvlabel'],
+                    description: device['description'],
+                    type: device['type'],
+                    zone: {
+                        id: zone,
+                        name: (this.zones.find(e => e.id == zone) ?? { name: "" }).name
+                    },
+                    functions: subfunctions.flat().map(e => {
+                        const func = this.functions.find(f => f.id == e.function)
 
-        return this.devices = this.devices.filter(e => !(e.zone.name == "Overview" && e.description == "Zone RISCO"))
+                        if (func == undefined) {
+                            //console.warn(`Found device "${device['dvlabel']}" without function , skipping...`)
+                            return undefined
+                        }
+
+                        return {
+                            function: func.name,
+                            functionId: func.id,
+                            subfunction: func.subfunctions.find(subfunction => subfunction.id == e.subfunction).name,
+                            subfunctionId: e.subfunction
+                        }
+                    }).filter(e => e != undefined),
+                }
+            })
+                .filter(e => e != undefined)
+                .filter(e => !(e.zone.name == "Overview" && e.description == "Zone RISCO"))
+
+            console.log("--- MAPPED DEVICE TABLE ----")
+            console.table(this.devices)
+            this.devicesLoaded = true
+            resolve(this.devices)
+        })
     }
 
     async loadFunctions() {
@@ -154,19 +169,20 @@ export default class Dovit extends EventEmitter {
 
     async loadZones() {
         console.log("loading zones...")
-        const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/higeo-map.c`)
+        this.zones = []
+        // const res = await axios.get(`http://${this.ip}:${this.uiPort}/client/higeo-map.c`)
 
-        const zones = new XMLParser({
-            ignoreAttributes: false,
-            attributeNamePrefix: "@_"
-        }).parse(res.data)["higeo-map"]["geozone"]
+        // const zones = new XMLParser({
+        //     ignoreAttributes: false,
+        //     attributeNamePrefix: "@_"
+        // }).parse(res.data)["higeo-map"]["geozone"]
 
-        this.zones = zones.map(device => {
-            return {
-                id: device['@_id'],
-                name: device['label'],
-            }
-        })
+        // this.zones = zones.map(device => {
+        //     return {
+        //         id: device['@_id'],
+        //         name: device['label'],
+        //     }
+        // })
     }
 
     __handleData(client, data) {
