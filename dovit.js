@@ -122,7 +122,6 @@ export default class Dovit extends EventEmitter {
                 }
             })
                 .filter(e => e != undefined)
-                .filter(e => !(e.zone.name == "Overview" && e.description == "Zone RISCO"))
 
             console.log("--- MAPPED DEVICE TABLE ----")
             console.table(this.devices)
@@ -162,9 +161,6 @@ export default class Dovit extends EventEmitter {
                 })
             }
         })
-
-        if (this.functions == undefined)
-            console.error("No functions loaded")
     }
 
     async loadZones() {
