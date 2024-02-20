@@ -7,6 +7,5 @@
     "mqtt": {
         "url": "mqtt://10.10.0.17",
         "topic": "dovit2mqtt"
-
     }
 }

@@ -8,7 +8,7 @@ export default class SecurityModule extends Module {
     constructor(config, dovit, mqtt) {
 
         dovit.loadDevices().then(devices => {
-            var motionSensors = devices.filter(e => e.functions.find(f => f.subfunction == "presence sensor"))
+            var motionSensors = devices.filter(e => e.functions.find(f => f.subfunction == "presence sensor" || f.subfunction == "sensor state"))
 
             for (var motionSensor of motionSensors) {
                 this.motionSensors[motionSensor.id] = { id: motionSensor.id, name: motionSensor.name, state: "OFF" }
@@ -24,7 +24,7 @@ export default class SecurityModule extends Module {
         this.zones[device.zone.id] = this.zones[device.zone.id] || {}
 
         switch (func.subfunction) {
-            case "presence sensor":
+            case "presence sensor" || "sensor state":
                 this.zones[device.zone.id]["occupancy"] = message.statevalue == 1 ? true : false
                 this.mqtt.publish(`${this.config.mqtt.topic}/${device.id}/state`, message.statevalue == 1 ? "ON" : "OFF")
                 break;
@@ -51,6 +51,7 @@ export default class SecurityModule extends Module {
             console.log(`Publishing motion sensor ${sensor.name} with id ${sensor.id}`)
             this.mqtt.publish(`homeassistant/binary_sensor/${this.config.mqtt.topic}_${sensor.id}/config`, JSON.stringify({
                 name: sensor.name,
+                unique_id: `${this.config.mqtt.topic}_${sensor.id}`,
                 device_class: "motion",
                 state_topic: `${this.config.mqtt.topic}/${sensor.id}/state`,
                 payload_on: "ON",
