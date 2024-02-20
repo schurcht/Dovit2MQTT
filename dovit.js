@@ -28,7 +28,7 @@ export default class Dovit extends EventEmitter {
                 client.dp.on('data', (data) => client.__handleData(client, data));
 
                 this.ping();
-                setInterval(this.ping, PING_INTERVAL)
+                setInterval(this.ping.bind(this), PING_INTERVAL)
                 resolve();
             });
 
