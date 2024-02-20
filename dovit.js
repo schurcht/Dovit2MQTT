@@ -99,7 +99,7 @@ export default class Dovit extends EventEmitter {
                     const func = this.functions.find(f => f.id == e.function)
 
                     if (func == undefined){
-                        console.warn(`Found device "${device['dvlabel']}" with function , skipping...`)
+                        //console.warn(`Found device "${device['dvlabel']}" without function , skipping...`)
                         return undefined
                     }
 
