@@ -50,8 +50,13 @@ export default class ClimateModule extends Module {
                 this.zones[device.zone.id]["pump"] = message.statevalue == 1 ? "on" : "off"
                 break;
             default:
-                console.log(func)
-                console.log(message)
+                console.warn("--- CLIMATE (Unknown device) ---")
+                console.log({
+                    id: device.id,
+                    name: device.name,
+                    func,
+                    message
+                })
         }
 
         //console.log(this.zones[device.zone.id])
