@@ -42,6 +42,7 @@ export default class LightsModule extends Module {
                 unique_id: "dovit2mqtt_" + light.id,
                 state_topic: `${this.config.mqtt.topic}/${light.id}/state`,
                 command_topic: `${this.config.mqtt.topic}/${light.id}/set`,
+                icon: "mdi:lightbulb"
             }))
 
             this.mqtt.subscribe(`${this.config.mqtt.topic}/${light.id}/set`)

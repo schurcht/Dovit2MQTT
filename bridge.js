@@ -42,6 +42,22 @@ export default class Bridge {
                 this.dovit.on("deviceUpdate", (newState) => {
                     this.__handleEventConversion(newState, this.devices.find(device => device.id == newState["@_id"]))
                 })
+
+                this.mqtt.subscribe("homeassistant/status")
+                this.mqtt.on("message", (topic, message) => {
+                    if (topic != "homeassistant/status")
+                        return
+
+                    console.log("Homeassistant went " + message)
+
+                    if (message != "online")
+                        return
+
+                    console.log("Publishing devices and triggering update")
+                    this.loadedModules.forEach(e => e.publishDevices())
+                    this.dovit.ping()
+                })
+
                 resolve();
             })
         })

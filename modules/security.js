@@ -58,6 +58,7 @@ export default class SecurityModule extends Module {
                 state_topic: `${this.config.mqtt.topic}/${sensor.id}/state`,
                 payload_on: "ON",
                 payload_off: "OFF",
+                icon: "mdi:motion-sensor"
             }))
         })
     }

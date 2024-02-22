@@ -42,6 +42,7 @@ export default class ClimateModule extends Module {
                 break;
             case "valve":
                 this.zones[device.zone.id]["valve_state"] = message.statevalue == 1 ? "open" : "closed"
+                this.mqtt.publish(`${this.config.mqtt.topic}/thermostat_${device.zone.id}/mode`, message.statevalue == 1 ? "heat" : "off")
                 break;
             case "season mode":
                 this.zones[device.zone.id]["season_mode"] = message.statevalue == 1 ? "winter" : "summer"
@@ -70,8 +71,7 @@ export default class ClimateModule extends Module {
                 name: "Thermostat " + sensor.zone.name,
                 unit_of_mesaurement: "°C",
                 unique_id: "dovit2mqtt_thermostat_" + sensor.zone.id,
-                mode: ["off", "auto"],
-                mode_command_topic: `${this.config.mqtt.topic}/thermostat_${sensor.zone.id}/mode/set`,
+                modes: ["off", "heat"],
                 mode_state_topic: `${this.config.mqtt.topic}/thermostat_${sensor.zone.id}/mode`,
                 current_temperature_topic: `${this.config.mqtt.topic}/thermostat_${sensor.zone.id}/temperature`,
                 temperature_command_topic: `${this.config.mqtt.topic}/thermostat_${sensor.zone.id}/temperature_desired/set`,

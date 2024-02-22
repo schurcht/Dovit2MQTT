@@ -23,12 +23,7 @@ export default class CoveringModule extends Module {
     async handleSubfunction(device, func, message) {
         this.shutters[device.id] = this.shutters[device.id] || new WindowCoveringWrapper()
 
-        //console.log("Handling subfunction", func.subfunction, "for device", device.name, "with message", message)
-
-        if (func.subfunction != "raffstores") {
-            console.warn("ShuttersModule: subfunction '" + func.subfunction + "' not supported")
-            return;
-        }
+        console.log("Handling subfunction", func.subfunction, "for device", device.name, "with message", JSON.stringify(message))
 
         if (message.statevalue == 0) {
             this.shutters[device.id].stop(message)
@@ -47,14 +42,23 @@ export default class CoveringModule extends Module {
 
     openShutter(deviceId) {
         this.dovit.sendCommand(deviceId, 1, 1, 0)
+        this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "opening")
+        setTimeout(() => {
+            this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "stopped")
+        })
     }
 
     closeShutter(deviceId) {
         this.dovit.sendCommand(deviceId, 1, 2, 0)
+        this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "closing")
+        setTimeout(() => {
+            this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "stopped")
+        })
     }
 
     stopShutter(deviceId) {
         this.dovit.sendCommand(deviceId, 1, 0, 0)
+        this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "stopped")
     }
 
     async publishDevices() {
@@ -65,10 +69,6 @@ export default class CoveringModule extends Module {
                 device_class: "shutter",
                 state_topic: `${this.config.mqtt.topic}/${shutter.id}/state`,
                 command_topic: `${this.config.mqtt.topic}/${shutter.id}/set`,
-                payload_open: "OPEN",
-                payload_close: "CLOSE",
-                payload_stop: "STOP",
-                optimistic: false
             }))
 
             this.mqtt.subscribe(`${this.config.mqtt.topic}/${shutter.id}/set`)
