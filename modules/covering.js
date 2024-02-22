@@ -8,7 +8,7 @@ export default class CoveringModule extends Module {
     constructor(config, dovit, mqtt) {
 
         dovit.loadDevices().then(devices => {
-            var shutters = devices.filter(e => e.functions.find(f => f.subfunction == "raffstores" || f.subfunction == "shutter"))
+            var shutters = devices.filter(e => e.functions.find(f => f.subfunction == "raffstores" || f.subfunction == "shutters"))
 
             for (var shutter of shutters) {
                 this.shutters[shutter.id] = new WindowCoveringWrapper(parseInt(shutter.id), "Shutter " + shutter.name, "STOP")
