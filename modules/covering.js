@@ -45,7 +45,7 @@ export default class CoveringModule extends Module {
         this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "opening")
         setTimeout(() => {
             this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "stopped")
-        })
+        }, 5000)
     }
 
     closeShutter(deviceId) {
@@ -53,7 +53,7 @@ export default class CoveringModule extends Module {
         this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "closing")
         setTimeout(() => {
             this.mqtt.publish(`${this.config.mqtt.topic}/${deviceId}/state`, "stopped")
-        })
+        }, 5000)
     }
 
     stopShutter(deviceId) {
