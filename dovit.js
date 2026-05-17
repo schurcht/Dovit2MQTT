@@ -9,6 +9,7 @@ export default class Dovit extends EventEmitter {
 
     dp = new net.Socket();
     messageBuffer = "";
+    connected = false;
 
     devices = []
 
@@ -25,6 +26,7 @@ export default class Dovit extends EventEmitter {
             client.dp = new net.Socket();
             await client.loadDevices();
             client.dp.connect(this.dpPort, this.ip, () => {
+                client.connected = true;
                 client.dp.on('data', (data) => client.__handleData(client, data));
 
                 this.ping();
@@ -33,14 +35,17 @@ export default class Dovit extends EventEmitter {
             });
 
             client.dp.on('error', (err) => {
+                client.connected = false;
                 console.error("Error connecting to Dovit", err)
                 process.exit(1)
             });
             client.dp.on('close', () => {
+                client.connected = false;
                 console.log("Connection to Dovit closed")
                 process.exit(1)
             })
             client.dp.on('end', () => {
+                client.connected = false;
                 console.log("Connection to Dovit ended")
                 process.exit(0)
             })
