@@ -5,7 +5,14 @@
         "uiPort": "90"
     },
     "mqtt": {
-        "url": "mqtt://10.10.0.17",
+        "url": "mqtt://10.10.1.30",
         "topic": "dovit2mqtt"
+    },
+    "shutters": {
+        "default": {
+            "openTravelTime": 54000,
+            "closeTravelTime": 52000,
+            "tiltTime": 1300
+        }
     }
 }

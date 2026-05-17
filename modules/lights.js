@@ -3,6 +3,7 @@ import Module from "./module.js"
 export default class LightsModule extends Module {
 
     lights = []
+    _messageHandlerBound = false
 
     constructor(config, dovit, mqtt) {
         dovit.loadDevices().then(devices => {
@@ -48,17 +49,19 @@ export default class LightsModule extends Module {
             this.mqtt.subscribe(`${this.config.mqtt.topic}/${light.id}/set`)
         })
 
-        this.mqtt.on("message", (topic, message) => {
-            const id = topic.split("/")[1]
-            const action = topic.split("/")[2]
+        if (!this._messageHandlerBound) {
+            this._messageHandlerBound = true
+            this.mqtt.on("message", (topic, message) => {
+                const parts = topic.split("/")
+                if (parts.length !== 3 || parts[2] !== "set") return
 
-            if (action == "set" && this.lights[id] != undefined) {
-                console.log("Sending command to dovit for light #", id, "to set",  message.toString())
+                const id = parts[1]
+                if (this.lights[id] == undefined) return
+
+                console.log("Sending command to dovit for light #", id, "to set", message.toString())
                 this.dovit.sendCommand(id, 0, message == "ON" ? 1 : 0)
-            } else {
-                console.log("Unknown action '", action, "' or unknown light #", id)
-            }
-         })
+            })
+        }
     }
 
 }

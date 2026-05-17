@@ -42,12 +42,6 @@ export default class Bridge {
                 // Publish device discovery configs now that MQTT is connected
                 this.loadedModules.forEach(e => e.publishDevices())
 
-                // Restore shutter positions from MQTT retained values
-                const coveringModule = this.loadedModules.find(e => e.moduleName === "Motors App")
-                if (coveringModule && coveringModule.restorePositions) {
-                    coveringModule.restorePositions()
-                }
-
                 this.dovit.on("deviceUpdate", (newState) => {
                     this.__handleEventConversion(newState, this.devices.find(device => device.id == newState["@_id"]))
                 })
